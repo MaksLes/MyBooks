@@ -9,7 +9,7 @@ import BookDetailView from '../views/BookDetailsView.vue' // Import nowego widok
 import { useAuthStore } from '../stores/auth'
 
 const router = createRouter({
-  history: createWebHistory(import.meta.env.BASE_URL),
+  history: createWebHistory(import.meta.env.BASE_URL), //czyste URL-e bez #
   routes: [
     { path: '/', name: 'home', component: HomeView },
     { path: '/login', name: 'login', component: LoginView },
@@ -21,6 +21,7 @@ const router = createRouter({
   ]
 })
 
+//sprawdza przed każdą nawigacją czy użytkownik jest zalogowany
 router.beforeEach((to) => {
   if (to.meta.requiresAuth && !useAuthStore().isAuthenticated) {
     return { name: 'login' }

@@ -5,7 +5,7 @@ import { useRoute, useRouter } from 'vue-router'
 
 const route = useRoute()
 const router = useRouter()
-const bookId = route.params.id
+const bookId = route.params.id // id książki z URL-a (/edit/:id)
 
 const book = ref({
   title: '',
@@ -16,7 +16,7 @@ const book = ref({
 
 const errorMsg = ref('')
 
-// 1. Pobierz dane książki przy wejściu na stronę
+// Pobiera dane książki i wypełnia formularz przy wejściu na stronę
 onMounted(async () => {
   try {
     const response = await api.get(`/books/${bookId}`)
@@ -26,7 +26,7 @@ onMounted(async () => {
   }
 })
 
-// 2. Wyślij zaktualizowane dane
+// Wysyła zaktualizowane dane do API
 const handleUpdate = async () => {
   try {
     await api.put(`/books/${bookId}`, book.value)

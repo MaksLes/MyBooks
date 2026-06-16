@@ -11,6 +11,7 @@ const errorMsg = ref('');
 const router = useRouter();
 
 const handleRegister = async () => {
+  //walidacja zgodności haseł po stronie klienta
   if (password.value !== confirmPassword.value) {
     errorMsg.value = "Hasła nie są identyczne.";
     return;
@@ -22,7 +23,7 @@ const handleRegister = async () => {
       email: email.value,
       password: password.value
     });
-    router.push('/login');
+    router.push('/login'); //po rejestracji przekierowanie na logowanie
   } catch (err: any) {
     errorMsg.value = err.response?.data?.error || "Błąd rejestracji";
   }

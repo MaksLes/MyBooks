@@ -1,4 +1,4 @@
-process.loadEnvFile();
+process.loadEnvFile(); //ładuje zmienne z pliku .env
 
 const express = require('express');
 const cors = require('cors');
@@ -8,44 +8,45 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 
 const app = express();
-app.use(cors());
-app.use(express.json());
+app.use(cors()); // zezwala na żądania z frontendu (inny port)
+app.use(express.json()); // parsuje ciało żadań jako JSON
 
-const SECRET_KEY = process.env.JWT_SECRET;
+const SECRET_KEY = process.env.JWT_SECRET; //klucz do podpisywania tokenów JWT
 
 // Ścieżki do plików danych
-const usersPath = path.join(__dirname, 'data', 'users.json');
-const booksPath = path.join(__dirname, 'data', 'books.json');
+const usersPath = path.join(__dirname, 'data', 'users.json'); //ścieżka do plików użytkowników
+const booksPath = path.join(__dirname, 'data', 'books.json'); //ścieżka do pliku książek
 
-// Pomocnicze funkcje do czytania/zapisu
+// odczytuje dane z pliku JSON
 const readData = (filePath) => {
   try {
     const data = fs.readFileSync(filePath, 'utf8');
     return JSON.parse(data);
   } catch (err) {
-    return [];
+    return []; //zwraca pustą tablicę jeśli plik nie istnieje
   }
 };
 
+//zapisuje dane do pliku JSON
 const writeData = (filePath, data) => {
   fs.writeFileSync(filePath, JSON.stringify(data, null, 2), 'utf8');
 };
 
-// --- MIDDLEWARE: AUTORYZACJA ---
+// middleware weryfikujący token JWT w nagłówku Authorization
 const authenticateToken = (req, res, next) => {
   const authHeader = req.headers['authorization'];
-  const token = authHeader && authHeader.split(' ')[1];
+  const token = authHeader && authHeader.split(' ')[1]; // wyciąga token z "Bearer <token>"
 
   if (!token) return res.status(401).json({ error: "Brak tokena, zaloguj się." });
 
   jwt.verify(token, SECRET_KEY, (err, user) => {
     if (err) return res.status(403).json({ error: "Sesja wygasła." });
-    req.user = user; // Zawiera email i name
+    req.user = user; // dane użytkownika dostępne w kolejnych handlerach
     next();
   });
 };
 
-// --- ENDPOINTY AUTENTYKACJI ---
+// rejestracja użytkownika
 
 app.post('/api/auth/register', async (req, res) => {
   const { email, password, name } = req.body;
@@ -55,40 +56,39 @@ app.post('/api/auth/register', async (req, res) => {
     return res.status(400).json({ error: "Użytkownik już istnieje." });
   }
 
-  const hashedPassword = await bcrypt.hash(password, 10);
+  const hashedPassword = await bcrypt.hash(password, 10); //hashuje hasło przed zapisem
   users.push({ email, password: hashedPassword, name });
   writeData(usersPath, users);
   res.status(201).json({ message: "Zarejestrowano pomyślnie!" });
 });
 
+// logowanie użytkownika
 app.post('/api/auth/login', async (req, res) => {
   const { email, password } = req.body;
   const users = readData(usersPath);
   const user = users.find(u => u.email === email);
 
-  if (user && await bcrypt.compare(password, user.password)) {
-    const token = jwt.sign({ email: user.email, name: user.name }, SECRET_KEY, { expiresIn: '2h' });
+  if (user && await bcrypt.compare(password, user.password)) { // porównuje hasło z hashem
+    const token = jwt.sign({ email: user.email, name: user.name }, SECRET_KEY, { expiresIn: '2h' }); //token ważny przez 2 godziny
     res.json({ token, name: user.name });
   } else {
     res.status(401).json({ error: "Błędny email lub hasło." });
   }
 });
 
-// --- ENDPOINTY KSIĄŻEK ---
-
-// 1. Pobierz wszystkie książki zalogowanego użytkownika
+//pobiera wszystkie książki zalogowanego użytkownika
 app.get('/api/books', authenticateToken, (req, res) => {
   const allBooks = readData(booksPath);
   const userEmail = req.user.email;
   
   // Filtrujemy, aby pokazać tylko książki należące do zalogowanego maila
-  const userBooks = allBooks.filter(b => b.owner === userEmail);
+  const userBooks = allBooks.filter(b => b.owner === userEmail); //tylko książki tego użytkownika
   
   console.log(`[GET] Użytkownik ${userEmail} pobrał listę. Znaleziono: ${userBooks.length}`);
   res.json(userBooks);
 });
 
-// 2. Pobierz jedną książkę po ID
+// pobiera szczegóły jednej książki 
 app.get('/api/books/:id', authenticateToken, (req, res) => {
   const allBooks = readData(booksPath);
   const bookId = req.params.id;
@@ -107,17 +107,17 @@ app.get('/api/books/:id', authenticateToken, (req, res) => {
   }
 });
 
-// 3. Dodaj nową książkę
+// dodaje nową książkę
 app.post('/api/books', authenticateToken, (req, res) => {
   const { title, author, rating, description } = req.body;
   const books = readData(booksPath);
 
   const newBook = { 
-    id: Date.now(), 
-    owner: req.user.email, // Przypisanie e-maila z tokena
+    id: Date.now(), // unikalny id oparty na timestampie
+    owner: req.user.email, // Przypisanie książki do zalogowanego użytkownika
     title, 
     author, 
-    rating: Number(rating), 
+    rating: Number(rating),  //konwersja na liczbę (formularz wysyła string)
     description 
   };
   
@@ -127,7 +127,7 @@ app.post('/api/books', authenticateToken, (req, res) => {
   res.status(201).json(newBook);
 });
 
-// 4. Edytuj książkę
+// aktualizuje dane książki
 app.put('/api/books/:id', authenticateToken, (req, res) => {
   let books = readData(booksPath);
   const bookId = req.params.id;
@@ -143,7 +143,7 @@ app.put('/api/books/:id', authenticateToken, (req, res) => {
   }
 });
 
-// 5. Usuń książkę
+// usuwa książkę
 app.delete('/api/books/:id', authenticateToken, (req, res) => {
   let books = readData(booksPath);
   const bookId = req.params.id;

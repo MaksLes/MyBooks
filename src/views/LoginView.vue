@@ -4,9 +4,9 @@ import api from '../lib/api';
 import { useRouter } from 'vue-router';
 import { useAuthStore } from '../stores/auth';
 
-const email = ref('');
-const password = ref('');
-const errorMsg = ref('');
+const email = ref(''); // pole email formularza
+const password = ref(''); // pole hasła formularza
+const errorMsg = ref(''); // komunikat błędu 
 const authStore = useAuthStore();
 const router = useRouter();
 
@@ -18,7 +18,7 @@ const handleLogin = async () => {
     });
     
     // Zapisujemy token i otrzymane imię
-    authStore.login(response.data.token, response.data.name);
+    authStore.login(response.data.token, response.data.name); //zapisywanie sesji
     router.push('/');
   } catch (err: any) {
     errorMsg.value = "Błędne dane logowania";

@@ -7,9 +7,10 @@ const authStore = useAuthStore()
 const router = useRouter()
 
 // Reaktywne sprawdzanie statusu logowania i imienia
-const isLoggedIn = computed(() => authStore.isAuthenticated)
-const userName = computed(() => authStore.userName)
+const isLoggedIn = computed(() => authStore.isAuthenticated) // czy użytkownik jest zalogowany
+const userName = computed(() => authStore.userName) // imię zalgowanego użytkownika
 
+//wylogowuje i przekierowuje na stronę logowania
 const handleLogout = () => {
   authStore.logout()
   router.push('/login')
@@ -64,7 +65,7 @@ body {
 }
 
 .nav-link.router-link-active {
-  color: #ffc107 !important; /* Podświetlenie aktywnej zakładki na złoto */
+  color: #ffc107 !important; /* Podświetlenie aktywnej zakładki na żółto */
   font-weight: bold;
 }
 </style>

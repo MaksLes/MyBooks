@@ -2,9 +2,10 @@
 import { ref, onMounted } from 'vue'
 import api from '../lib/api'
 
-const books = ref<any[]>([])
-const loading = ref(true)
+const books = ref<any[]>([]) //lista książek użytkownika
+const loading = ref(true) //stan ładowania
 
+//pobiera książki z API
 const fetchBooks = async () => {
   try {
     const response = await api.get('/books')
@@ -16,6 +17,7 @@ const fetchBooks = async () => {
   }
 }
 
+//usuwa książkę po potwierdzeniu 
 const deleteBook = async (id: number) => {
   if (confirm('Czy na pewno chcesz usunąć tę książkę?')) {
     try {
@@ -27,7 +29,7 @@ const deleteBook = async (id: number) => {
   }
 }
 
-onMounted(fetchBooks)
+onMounted(fetchBooks) //pobiera dane przy załadowaniu komponentu
 </script>
 
 <template>
