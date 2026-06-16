@@ -91,7 +91,7 @@ onMounted(async () => {
             <div class="card-body">
               <div v-if="lastBook" class="d-flex align-items-start gap-3">
                 <div class="bg-light p-3 rounded text-warning shadow-sm">
-                  <span style="font-size: 2rem;">📖</span>
+                  <ion-icon name="book-outline" class="book-icon"></ion-icon>
                 </div>
                 <div>
                   <h5 class="fw-bold mb-1">{{ lastBook.title }}</h5>
@@ -121,6 +121,10 @@ onMounted(async () => {
 </template>
 
 <style scoped>
+.book-icon{
+  font-size: 1.7rem;
+  color:black;
+}
 .card { transition: transform 0.2s; border-radius: 1rem; }
 .card:hover { transform: translateY(-5px); }
 </style>

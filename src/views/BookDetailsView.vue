@@ -31,7 +31,7 @@ onMounted(async () => {
     <div v-else-if="book" class="card shadow-lg border-0 rounded-4 overflow-hidden">
       <div class="row g-0">
         <div class="col-md-4 bg-warning d-flex align-items-center justify-content-center p-5">
-          <span style="font-size: 10rem;">📚</span>
+          <ion-icon name="book-outline" style="font-size: 7rem;"></ion-icon>
         </div>
         <div class="col-md-8">
           <div class="card-body p-5">

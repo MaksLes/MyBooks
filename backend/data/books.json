@@ -14,5 +14,13 @@
     "author": "Jeff Kinney",
     "rating": 8,
     "description": "Młodzieżowa fajna książka"
+  },
+  {
+    "id": 1781623068126,
+    "owner": "user@example.com",
+    "title": "asdsd",
+    "author": "asdasd",
+    "rating": 10,
+    "description": "asuhasd"
   }
 ]
